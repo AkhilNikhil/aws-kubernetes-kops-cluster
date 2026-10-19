@@ -1,0 +1,11 @@
+# Environment & credentials
+.env
+*.pem
+*.key
+kubeconfig*
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
