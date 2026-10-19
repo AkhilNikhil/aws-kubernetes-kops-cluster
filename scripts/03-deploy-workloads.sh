@@ -6,25 +6,24 @@ K8S_DIR="${SCRIPT_DIR}/../k8s"
 
 echo "=========================================================="
 echo " Deploying Multi-Tier Production Workloads to Kubernetes"
+echo " Architecture: Internet -> AWS ELB -> Frontend (LoadBalancer)"
+echo "             -> Backend (ClusterIP) -> MySQL (ClusterIP+Headless)"
 echo "=========================================================="
 
-echo "[1/6] Applying Production Namespace..."
+echo "[1/5] Applying Production Namespace..."
 kubectl apply -f "${K8S_DIR}/00-namespace.yaml"
 
-echo "[2/6] Applying ConfigMaps and Secrets..."
+echo "[2/5] Applying ConfigMaps and Secrets..."
 kubectl apply -f "${K8S_DIR}/01-configmap-secret.yaml"
 
-echo "[3/6] Applying MySQL StatefulSet and Headless Service..."
+echo "[3/5] Applying MySQL StatefulSet + Headless Service (ClusterIP internal)..."
 kubectl apply -f "${K8S_DIR}/02-mysql-statefulset.yaml"
 
-echo "[4/6] Applying Node.js Backend API Deployment..."
+echo "[4/5] Applying Node.js Backend API Deployment (ClusterIP internal)..."
 kubectl apply -f "${K8S_DIR}/03-backend-deployment.yaml"
 
-echo "[5/6] Applying Frontend UI Deployment..."
+echo "[5/5] Applying Frontend UI Deployment (LoadBalancer -> AWS ELB)..."
 kubectl apply -f "${K8S_DIR}/04-frontend-deployment.yaml"
-
-echo "[6/6] Applying Ingress Routing Rules..."
-kubectl apply -f "${K8S_DIR}/05-ingress.yaml"
 
 echo ""
 echo "Waiting for pods to reach Ready status..."
@@ -39,3 +38,8 @@ kubectl get pods -n production -o wide
 echo ""
 echo "--- Services in Namespace 'production' ---"
 kubectl get svc -n production
+echo ""
+echo "--- Frontend Public URL (AWS ELB) ---"
+echo "Wait ~60s for ELB to provision, then run:"
+echo "  kubectl get svc frontend-service -n production"
+echo "  Look for EXTERNAL-IP — that is your AWS ELB DNS hostname"
