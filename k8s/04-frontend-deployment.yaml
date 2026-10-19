@@ -6,7 +6,7 @@ metadata:
   labels:
     app: frontend-ui
 spec:
-  type: ClusterIP
+  type: LoadBalancer        # AWS ELB — exposes frontend publicly
   ports:
     - port: 80
       targetPort: 80
